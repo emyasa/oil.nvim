@@ -1,6 +1,3 @@
-require("simaxme-java.java").setup()
-local java_rename = require("simaxme-java.rename")
-
 local cache = require("oil.cache")
 local columns = require("oil.columns")
 local config = require("oil.config")
@@ -638,18 +635,7 @@ M.perform_action = function(action, cb)
       if config.git.mv(src_path, dest_path) then
         git.mv(action.entry_type, src_path, dest_path, cb)
       else
-        fs.recursive_move(action.entry_type, src_path, dest_path, function(err)
-            if not err then
-                if action.entry_type == "file" then
-                    java_rename.on_rename_file(src_path, dest_path)
-                end
-
-                if action.entry_type == "directory" then
-                    java_rename.on_rename_file(src_path, dest_path, true)
-                end
-            end
-            cb(err)
-        end)
+        fs.recursive_move(action.entry_type, src_path, dest_path, cb)
       end
     else
       -- We should never hit this because we don't implement supported_cross_adapter_actions
