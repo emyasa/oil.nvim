@@ -349,6 +349,18 @@ M.recursive_copy = function(entry_type, src_path, dest_path, cb)
   end)
 end
 
+local function emit_file_rename_event(src, dest)
+    vim.schedule(function()
+        vim.api.nvim_exec_autocmds("User", {
+            pattern = "OilFileRenamed",
+            data = {
+                src = src,
+                dest = dest,
+            },
+        })
+    end)
+end
+
 ---@param entry_type oil.EntryType
 ---@param src_path string
 ---@param dest_path string
@@ -368,6 +380,7 @@ M.recursive_move = function(entry_type, src_path, dest_path, cb)
     else
       if entry_type ~= "directory" then
         move_undofile(src_path, dest_path, false)
+        emit_file_rename_event(src_path, dest_path)
       end
       cb()
     end
